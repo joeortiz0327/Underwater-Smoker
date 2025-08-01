@@ -1,20 +1,29 @@
 const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
+const path = require('path');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
+// 👉 Servir archivos estáticos (frontend)
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// 👉 Servir index.html en la raíz
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
 const readData = (filename) => {
-  const path = `./backend/data/${filename}`;
-  return JSON.parse(fs.readFileSync(path, 'utf8'));
+  const pathFile = path.join(__dirname, 'data', filename);
+  return JSON.parse(fs.readFileSync(pathFile, 'utf8'));
 };
 
 const writeData = (filename, data) => {
-  const path = `./backend/data/${filename}`;
-  fs.writeFileSync(path, JSON.stringify(data, null, 2));
+  const pathFile = path.join(__dirname, 'data', filename);
+  fs.writeFileSync(pathFile, JSON.stringify(data, null, 2));
 };
 
 app.get('/api/products', (req, res) => {
